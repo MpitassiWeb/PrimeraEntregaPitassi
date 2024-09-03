@@ -1,8 +1,12 @@
 import { Router } from "express";
+import * as fs from "fs";
 
 const router = Router();
-
 let carts = [];
+
+if (fs.existsSync("carts.json")) {
+  carts = JSON.parse(fs.readFileSync("carts.json", "utf-8"));
+}
 
 router.get("/", (req, res) => {
   res.send(carts);
@@ -26,6 +30,7 @@ router.post("/", (req, res) => {
     products: [],
   };
   carts.push(newCart);
+  fs.writeFileSync("carts.json", JSON.stringify(carts));
   res.send({
     status: "success",
     message: `Carrito creado con id ${carts.length}`,
@@ -52,6 +57,7 @@ router.post("/:cid/product/:pid", (req, res) => {
   } else {
     carts[i].products[existe].quantity = carts[i].products[existe].quantity + 1;
   }
+  fs.writeFileSync("carts.json", JSON.stringify(carts));
   res.send({
     status: "success",
     error: `Producto ${idProduct} agregado correctamente`,

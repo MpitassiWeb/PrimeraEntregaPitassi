@@ -1,7 +1,12 @@
 import { Router } from "express";
-import { products } from "../../prod.js";
+import * as fs from "fs";
 
 const router = Router();
+let products = [];
+
+if (fs.existsSync("products.json")) {
+  products = JSON.parse(fs.readFileSync("products.json", "utf-8"));
+}
 
 router.get("/", (req, res) => {
   res.send(products);
@@ -44,6 +49,7 @@ router.post("/", (req, res) => {
   }
 
   products.push(newProduct);
+  fs.writeFileSync("products.json", JSON.stringify(products));
   res.send({ status: "success", message: "producto añadido correctamente" });
 });
 
@@ -78,6 +84,7 @@ router.put("/:id", (req, res) => {
 
   updateProduct = { ...updateProduct, id: idProduct };
   products[i] = updateProduct;
+  fs.writeFileSync("products.json", JSON.stringify(products));
   res.send({ status: "success", message: "Producto editado correctamente" });
 });
 
@@ -92,6 +99,7 @@ router.delete("/:id", (req, res) => {
       .send({ status: "error", error: "Producto no encontrado" });
   }
 
+  fs.writeFileSync("products.json", JSON.stringify(products));
   res.send({ status: "success", message: "Producto eliminado correctamente" });
 });
 
